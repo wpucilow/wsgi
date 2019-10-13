@@ -15,17 +15,31 @@ body = """<html>
 </html>"""
 
 
+# Though we’ve used a function in this case, any callable will do. The rules for the application object here are:
+# Must be a callable with environ and start_response parameters.
+# Must call the start_response callback before sending the body.
+# Must return an iterable with pieces of the document body.
+
 def application(environ, start_response):
     import pprint
-    pprint.pprint(environ)
+    # pprint.pprint(environ)
+    for k in environ:
+        if (k.upper() == 'PATH') or (k.upper() == 'PATH_INFO'):
+            print(f"{k} ---> {environ[k]}")
 
     response_body = body.format(
+        # software=environ.get('SERVER_SOFTWARE', default),
+        # path="aaaa",
+        # month="bbbb",
+        # date="cccc",
+        # year="dddd",
+        # client_ip="eeee"
         software=environ.get('SERVER_SOFTWARE', default),
-        path="aaaa",
-        month="bbbb",
-        date="cccc",
-        year="dddd",
-        client_ip="eeee"
+        path=environ.get('PATH_INFO', default),
+        month=datetime.datetime.now().strftime('%B'),
+        date=datetime.datetime.now().day,
+        year=datetime.datetime.now().year,
+        client_ip=environ.get('REMOTE_ADDR', default),
     )
     status = '200 OK'
 
